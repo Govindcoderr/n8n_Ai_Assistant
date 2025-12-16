@@ -9,7 +9,7 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 from groq import Groq
 
 # === REPLACE WITH YOUR REAL GROQ API KEY ===
-GROQ_API_KEY = "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"
+GROQ_API_KEY = "your_groq_api_key_here"
 
 client = Groq(api_key=GROQ_API_KEY)
 
