@@ -147,46 +147,14 @@
 
 
 
+from config.llm import get_llm
+from tools.categorize_prompt import create_categorize_prompt_tool
 
+llm = get_llm()
+categorize_tool = create_categorize_prompt_tool(llm)
 
-from fastapi import FastAPI
-from backend.schemas import UserRequest
-from backend.intent import extract_intent
-from backend.techniques import detect_techniques
-from backend.best_practices import BestPractices
-from backend.node_catalog import NodeCatalog
-from backend.workflow_builder import build_workflow
-from backend.llm import ask_llm
+result = categorize_tool({
+    "prompt": "Create an automation that checks weather daily and sends email alerts"
+})
 
-app = FastAPI()
-
-bp = BestPractices()
-catalog = NodeCatalog()
-
-@app.post("/analyze")
-def analyze(req: UserRequest):
-    intent = extract_intent(req.prompt)
-    techniques = detect_techniques(intent)
-    practices = bp.get(techniques)
-    workflow = build_workflow(techniques, catalog)
-
-    context = f"""
-User goal: {intent['goal']}
-
-Workflow:
-{workflow}
-
-Best practices:
-{practices}
-
-Explain clearly and step-by-step.
-"""
-
-    explanation = ask_llm(context)
-
-    return {
-        "intent": intent,
-        "techniques": techniques,
-        "workflow": workflow,
-        "explanation": explanation
-    }
+print(result)

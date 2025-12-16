@@ -1,6 +1,6 @@
-# types.python  - Definitions for workflow techniques and prompt categorization types in the backend categorizer module.
-
-from typing import List, Optional, Literal, TypedDict
+from typing import List, Optional
+from typing_extensions import Literal, TypedDict
+from dataclasses import dataclass
 
 WorkflowTechnique = Literal[
     "scheduling",
@@ -20,24 +20,32 @@ WorkflowTechnique = Literal[
     "human_in_the_loop",
 ]
 
-TECHNIQUE_DESCRIPTIONS = {
+TechniqueDescription = {
     "scheduling": "Running an action at a specific time or interval",
     "chatbot": "Receiving chat messages and replying",
     "form_input": "Gathering data from users via forms",
     "scraping_and_research": "Collecting information from websites or APIs",
-    "monitoring": "Checking status and acting on conditions",
-    "enrichment": "Adding extra data from other sources",
+    "monitoring": "Checking service or website status repeatedly",
+    "enrichment": "Adding extra details from other sources",
     "triage": "Classifying data for routing or prioritization",
     "content_generation": "Creating text, images, audio, or video",
-    "document_processing": "Processing PDFs, Word docs, or images",
-    "data_extraction": "Extracting specific information from inputs",
-    "data_analysis": "Finding patterns, trends, or insights",
+    "document_processing": "Taking action on content within files",
+    "data_extraction": "Pulling specific information from inputs",
+    "data_analysis": "Finding patterns or insights in data",
     "data_transformation": "Cleaning or restructuring data",
     "notification": "Sending alerts or updates",
-    "knowledge_base": "Using a centralized information collection",
+    "knowledge_base": "Building or using a centralized knowledge store",
     "human_in_the_loop": "Pausing for human input",
 }
 
-class PromptCategorization(TypedDict):
-    techniques: List[WorkflowTechnique]
-    confidence: Optional[float]
+
+# class PromptCategorization(TypedDict):
+#     techniques: List[WorkflowTechnique]
+#     confidence: Optional[float]
+
+
+
+@dataclass
+class PromptCategorization:
+    techniques: List[str]
+    confidence: Optional[float] = None
