@@ -1,0 +1,12 @@
+{
+    "MONITORING": "Use real-time triggers and notifications to monitor channels effectively.",
+    "CHATBOT": "Use AI chat agents for automated responses based on user input.",
+    "CONTENT_GENERATION": "Generate content dynamically based on context.",
+    "FORM_INPUT": "Validate inputs and ensure human review when needed.",
+    "HUMAN_IN_THE_LOOP": "Include manual verification for critical processes.",
+    "NOTIFICATION": "Send real-time notifications to relevant systems.",
+    "SCHEDULING": "Use cron-like scheduling for recurring tasks.",
+    "SCRAPING_AND_RESEARCH": "Automate data collection and parsing.",
+    "DATA_EXTRACTION": "Extract structured data from documents or APIs.",
+    "DATA_ANALYSIS": "Analyze extracted data for insights."
+}

@@ -1,0 +1,12 @@
+[
+    {"technique": "MONITORING", "nodes": ["Twitter Monitor", "Slack Alert", "Gmail Trigger"]},
+    {"technique": "CHATBOT", "nodes": ["OpenAI Chat Model", "Dialogflow Node"]},
+    {"technique": "CONTENT_GENERATION", "nodes": ["GPT Text Generator", "Image Generation Node"]},
+    {"technique": "FORM_INPUT", "nodes": ["Form Input Node", "Google Forms"]},
+    {"technique": "HUMAN_IN_THE_LOOP", "nodes": ["Manual Approval Node", "Review Queue"]},
+    {"technique": "NOTIFICATION", "nodes": ["Slack Notification", "Email Notification"]},
+    {"technique": "SCHEDULING", "nodes": ["Cron Node", "Scheduler Node"]},
+    {"technique": "SCRAPING_AND_RESEARCH", "nodes": ["Web Scraper Node", "API Data Fetcher"]},
+    {"technique": "DATA_EXTRACTION", "nodes": ["PDF Extractor", "Excel Parser"]},
+    {"technique": "DATA_ANALYSIS", "nodes": ["Data Analyzer", "Report Generator"]}
+]

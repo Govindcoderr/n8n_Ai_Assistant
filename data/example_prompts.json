@@ -1,0 +1,14 @@
+[
+    {
+        "prompt": "Monitor social channels for product mentions and auto-respond with campaign messages",
+        "techniques": ["MONITORING", "CHATBOT", "CONTENT_GENERATION"]
+    },
+    {
+        "prompt": "Collect partner referral submissions and verify client instances via BigQuery",
+        "techniques": ["FORM_INPUT", "HUMAN_IN_THE_LOOP", "NOTIFICATION"]
+    },
+    {
+        "prompt": "Scrape competitor pricing pages weekly and generate a summary report of changes",
+        "techniques": ["SCHEDULING", "SCRAPING_AND_RESEARCH", "DATA_EXTRACTION", "DATA_ANALYSIS"]
+    }
+]

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Logic AI Assistant</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Custom Logic AI Assistant</h1>
+        <textarea id="prompt" placeholder="Describe your workflow requirement..." rows="6"></textarea>
+        <button onclick="generateWorkflow()">Generate Workflow Guidance</button>
+
+        <h2>Workflow Summary</h2>
+        <pre id="summary"></pre>
+
+        <h2>LLM Step-by-Step Guide</h2>
+        <pre id="llm_guide"></pre>
+    </div>
+
+<script>
+async function generateWorkflow() {
+    const prompt = document.getElementById("prompt").value;
+    if (!prompt) {
+        alert("Please enter a workflow prompt.");
+        return;
+    }
+
+    const response = await fetch("http://127.0.0.1:8000/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        alert("Error: " + error.detail);
+        return;
+    }
+
+    const data = await response.json();
+    document.getElementById("summary").textContent = data.summary;
+    document.getElementById("llm_guide").textContent = data.llm_guide;
+}
+</script>
+</body>
+</html>
