@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,8 +15,8 @@
         <h2>Workflow Summary</h2>
         <pre id="summary"></pre>
 
-        <h2>LLM Step-by-Step Guide</h2>
-        <pre id="llm_guide"></pre>
+        <h2>prompt categorize</h2>
+        <pre id="prompt-categorize"></pre>
     </div>
 
 <script>
@@ -40,9 +40,43 @@ async function generateWorkflow() {
     }
 
     const data = await response.json();
-    document.getElementById("summary").textContent = data.summary;
-    document.getElementById("llm_guide").textContent = data.llm_guide;
+    document.getElementById("summary").textContent = JSON.stringify(data, null, 2);
+    document.getElementById("prompt-categorize").textContent = JSON.stringify(data.techniques, null, 2);
+    
 }
 </script>
 </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Logic AI Assistant</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="container">
+    <h1>Custom Logic AI Assistant</h1>
+
+    <textarea
+        id="prompt"
+        placeholder="Describe your workflow requirement..."
+        rows="6">
+    </textarea>
+
+    <button id="generateBtn">Generate Workflow Guidance</button>
+
+    <h2>Full API Response</h2>
+    <pre id="summary">Waiting for input...</pre>
+
+    <h2>Prompt Categorization</h2>
+    <pre id="prompt-categorize">—</pre>
+</div>
+
+<script src="script.js"></script>
+</body>
 </html>
+

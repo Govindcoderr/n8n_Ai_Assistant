@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
-from types.categorization import PromptCategorization
+from backend.mytypes.categorization import PromptCategorization
 
 
 @dataclass

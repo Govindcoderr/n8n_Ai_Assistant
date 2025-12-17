@@ -1,6 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from types.categorization import PromptCategorization
+from backend.mytypes.categorization import PromptCategorization
 
 PROMPT = """
 You are an expert workflow architect.

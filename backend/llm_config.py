@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def get_llm(
-    model: str = "llama-3.1-70b-versatile",
+    model: str = "openai/gpt-oss-120b",
     temperature: float = 0.2,
 ):
     """

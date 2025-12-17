@@ -1,15 +1,17 @@
 from pydantic import BaseModel, Field
 from typing import Dict, Any
 
-from Chains.prompt_categorization import prompt_categorization_chain
-from error import ValidationError, ToolExecutionError
-from tools.helpers.progress import create_progress_reporter
-from tools.helpers.response import (
+from backend.Chains.prompt_categorization import prompt_categorization_chain
+from backend.error import ValidationError, ToolExecutionError
+from backend.mytools.helpers.progress  import create_progress_reporter
+from backend.mytools.helpers.response import (
     create_success_response,
     create_error_response,
-)
-from types.tools import CategorizePromptOutput
 
+)
+from backend.mytypes.tools import CategorizePromptOutput
+
+#mytools.helpers.progress 
 
 class CategorizePromptSchema(BaseModel):
     prompt: str = Field(..., min_length=1, description="The user prompt to categorize")
