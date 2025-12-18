@@ -80,56 +80,59 @@ SESSIONS: Dict[str, ChatSession] = {}
 @app.post("/chat")
 def chat(req: ChatRequest):
 
-    # Create new session if needed
+    # Handle DONE button
+    if req.message == "__FINALIZE__":
+        req.message = "done"
+
+    # Create session if needed
     if req.session_id not in SESSIONS:
         SESSIONS[req.session_id] = ChatSession()
 
     session = SESSIONS[req.session_id]
 
-    # Process the message using your multi-turn engine
+    # Process user input via multi-turn engine
     result = process_user_prompt(req.message, session.history)
 
-    # --------------------------------------------------------
-    # FINALIZATION CASE
-    # --------------------------------------------------------
+    # -------------------------------------------------------
+    # FINALIZATION FLOW
+    # -------------------------------------------------------
     if result.get("finalized"):
 
         final_intent = result["clean_prompt"]
 
-        # (1) CALL /analyze API EXTERNALLY
+        # Automatically call /analyze API
         import requests
-        analyze_response = requests.post(
+        analysis = requests.post(
             "http://localhost:8000/analyze",
             json={"prompt": final_intent}
         ).json()
 
-        # (2) Remove session
+        # Remove session
         del SESSIONS[req.session_id]
 
-        # (3) Return BOTH final intent + analysis results
+        # Return both final intent and analysis
         return {
             "finalized": True,
             "final_intent": final_intent,
-            "analysis": analyze_response
+            "analysis": analysis
         }
 
-    # --------------------------------------------------------
+    # -------------------------------------------------------
     # CLARIFICATION NEEDED
-    # --------------------------------------------------------
+    # -------------------------------------------------------
     if result.get("stop"):
         return {
             "finalized": False,
             "response": result["reply"]
         }
 
-    # --------------------------------------------------------
-    # NORMAL UPDATE
-    # --------------------------------------------------------
+    # -------------------------------------------------------
+    # NORMAL CONTINUATION
+    # -------------------------------------------------------
     return {
         "finalized": False,
         "response": result["clean_prompt"]
     }
-
 
 
 

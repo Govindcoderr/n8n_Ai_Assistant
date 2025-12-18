@@ -68,47 +68,155 @@
 #             except requests.exceptions.RequestException as e:
 #                 st.error("Unable to connect to backend.")
 #                 st.text(str(e))
+
+
+
+# import streamlit as st
+# import uuid
+# import requests
+
+# # Backend endpoints
+# CHAT_URL = "http://localhost:8000/chat"
+# ANALYZE_URL = "http://localhost:8000/analyze"
+
+# # ----------------------------------------------------------
+# # PAGE SETUP
+# # ----------------------------------------------------------
+# st.set_page_config(page_title="Workflow Builder Assistant", layout="centered")
+# st.title("🤖 Workflow Builder Assistant")
+
+# # Choice between chat mode and analyze mode
+# mode = st.radio("Choose mode:", ["Workflow Builder (Chat)"])
+
+
+# # ==========================================================
+# # MODE 1 — MULTI-TURN WORKFLOW BUILDER (CHAT)
+# # ==========================================================
+# if mode == "Workflow Builder (Chat)":
+
+#     # New session ID if first time
+#     if "session_id" not in st.session_state:
+#         st.session_state.session_id = str(uuid.uuid4())
+
+#     # Conversation history
+#     if "messages" not in st.session_state:
+#         st.session_state.messages = []
+
+#     user_message = st.text_input("You:", placeholder="Describe the workflow you want to build...")
+
+#     send = st.button("Send")
+
+#     if send and user_message.strip():
+
+#         # Add user message to UI
+#         st.session_state.messages.append(("user", user_message))
+
+#         # Send message to backend
+#         res = requests.post(
+#             CHAT_URL,
+#             json={
+#                 "session_id": st.session_state.session_id,
+#                 "message": user_message
+#             }
+#         ).json()
+
+#         # --------------------------------------------------
+#         # FINALIZATION CASE
+#         # --------------------------------------------------
+#         if res.get("finalized"):
+
+#             final_intent = res["final_intent"]
+#             analysis = res["analysis"]
+
+#             # Display results
+#             st.success("🎉 Final Workflow Intent")
+#             st.write(final_intent)
+
+#             st.subheader("🔍 Analysis of Final Intent")
+#             st.json(analysis)
+
+#             # Reset session
+#             st.session_state.session_id = str(uuid.uuid4())
+#             st.session_state.messages = []
+
+#         else:
+#             # Continue the refinement chat
+#             reply = res["response"]
+#             st.session_state.messages.append(("assistant", reply))
+
+#     # --------------------------------------------------
+#     # DISPLAY CHAT HISTORY
+#     # --------------------------------------------------
+#     st.write("---")
+#     st.subheader("Conversation")
+
+#     for role, msg in st.session_state.messages:
+#         if role == "user":
+#             st.markdown(f"**👤 You:** {msg}")
+#         else:
+#             st.markdown(f"**🤖 Assistant:** {msg}")
+
+
+# # # ==========================================================
+# # # MODE 2 — SIMPLE PROMPT ANALYZER
+# # # ==========================================================
+# # elif mode == "Analyze Prompt":
+
+# #     prompt = st.text_area("Enter text to analyze")
+
+# #     if st.button("Analyze"):
+# #         if prompt.strip():
+# #             response = requests.post(ANALYZE_URL, json={"prompt": prompt}).json()
+# #             st.json(response)
+
+
+# frontend/app.py
+
 import streamlit as st
 import uuid
 import requests
 
-# Backend endpoints
 CHAT_URL = "http://localhost:8000/chat"
 ANALYZE_URL = "http://localhost:8000/analyze"
 
-# ----------------------------------------------------------
-# PAGE SETUP
-# ----------------------------------------------------------
 st.set_page_config(page_title="Workflow Builder Assistant", layout="centered")
 st.title("🤖 Workflow Builder Assistant")
 
-# Choice between chat mode and analyze mode
 mode = st.radio("Choose mode:", ["Workflow Builder (Chat)"])
 
 
 # ==========================================================
-# MODE 1 — MULTI-TURN WORKFLOW BUILDER (CHAT)
+# WORKFLOW BUILDER (CHAT MODE)
 # ==========================================================
 if mode == "Workflow Builder (Chat)":
 
-    # New session ID if first time
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
 
-    # Conversation history
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    user_message = st.text_input("You:", placeholder="Describe the workflow you want to build...")
 
-    send = st.button("Send")
+    # UI Layout for input + DONE button
+    col1, col2 = st.columns([4, 1])
 
-    if send and user_message.strip():
+    with col1:
+        user_message = st.text_input("You:", placeholder="Describe the workflow...")
 
-        # Add user message to UI
+    with col2:
+        done_pressed = st.button("DONE")
+
+
+    send_pressed = st.button("Send")
+
+
+    # ------------------------------------------------------
+    # SEND MESSAGE
+    # ------------------------------------------------------
+    if send_pressed and user_message.strip():
+
         st.session_state.messages.append(("user", user_message))
 
-        # Send message to backend
         res = requests.post(
             CHAT_URL,
             json={
@@ -117,33 +225,58 @@ if mode == "Workflow Builder (Chat)":
             }
         ).json()
 
-        # --------------------------------------------------
-        # FINALIZATION CASE
-        # --------------------------------------------------
         if res.get("finalized"):
-
             final_intent = res["final_intent"]
             analysis = res["analysis"]
 
-            # Display results
             st.success("🎉 Final Workflow Intent")
             st.write(final_intent)
 
             st.subheader("🔍 Analysis of Final Intent")
             st.json(analysis)
 
-            # Reset session
             st.session_state.session_id = str(uuid.uuid4())
             st.session_state.messages = []
 
         else:
-            # Continue the refinement chat
             reply = res["response"]
             st.session_state.messages.append(("assistant", reply))
 
-    # --------------------------------------------------
-    # DISPLAY CHAT HISTORY
-    # --------------------------------------------------
+
+    # ------------------------------------------------------
+    # DONE BUTTON FINALIZATION
+    # ------------------------------------------------------
+    if done_pressed:
+
+        res = requests.post(
+            CHAT_URL,
+            json={
+                "session_id": st.session_state.session_id,
+                "message": "__FINALIZE__"
+            }
+        ).json()
+
+        if res.get("finalized"):
+
+            final_intent = res["final_intent"]
+            analysis = res["analysis"]
+
+            st.success("🎉 Final Workflow Intent")
+            st.write(final_intent)
+
+            st.subheader("🔍 Analysis of Final Intent")
+            st.json(analysis)
+
+            st.session_state.session_id = str(uuid.uuid4())
+            st.session_state.messages = []
+
+        else:
+            st.error("❌ Backend did not finalize. Try again.")
+
+
+    # ------------------------------------------------------
+    # DISPLAY CONVERSATION
+    # ------------------------------------------------------
     st.write("---")
     st.subheader("Conversation")
 
@@ -155,13 +288,13 @@ if mode == "Workflow Builder (Chat)":
 
 
 # # ==========================================================
-# # MODE 2 — SIMPLE PROMPT ANALYZER
+# # SINGLE-SHOT ANALYZE MODE
 # # ==========================================================
 # elif mode == "Analyze Prompt":
 
-#     prompt = st.text_area("Enter text to analyze")
+#     prompt = st.text_area("Enter prompt to analyze")
 
 #     if st.button("Analyze"):
-#         if prompt.strip():
-#             response = requests.post(ANALYZE_URL, json={"prompt": prompt}).json()
-#             st.json(response)
+#         res = requests.post(ANALYZE_URL, json={"prompt": prompt}).json()
+#         st.json(res)
+

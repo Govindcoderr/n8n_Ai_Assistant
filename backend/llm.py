@@ -503,8 +503,15 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
 
     # 1. Finalization
     if is_refining and user_wants_to_finalize(user_input):
-        final = last_intent_message
+           # Use the last refined intent if exists
+        if last_intent_message:
+            final = last_intent_message
+        else:
+            # fallback: previous user message
+            final = history[-2]["content"] if len(history) >= 2 else user_input
+
         is_refining = False
+
         return {
             "stop": False,
             "finalized": True,
