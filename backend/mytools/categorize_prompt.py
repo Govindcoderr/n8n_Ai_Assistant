@@ -11,8 +11,6 @@ from backend.mytools.helpers.response import (
 )
 from backend.mytypes.tools import CategorizePromptOutput
 
-#mytools.helpers.progress 
-
 class CategorizePromptSchema(BaseModel):
     prompt: str = Field(..., min_length=1, description="The user prompt to categorize")
 
