@@ -560,32 +560,32 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
 # CLI LOOP
 # -------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    history = []
+# if __name__ == "__main__":
+#     history = []
 
-    print("n8n Workflow AI Assistant — Multi-Turn Refinement Mode Enabled")
-    print("Type your message. Ctrl+C to exit.\n")
+#     print("n8n Workflow AI Assistant — Multi-Turn Refinement Mode Enabled")
+#     print("Type your message. Ctrl+C to exit.\n")
 
-    while True:
-        try:
-            user_input = input("You: ").strip()
-            result = process_user_prompt(user_input, history)
+#     while True:
+#         try:
+#             user_input = input("You: ").strip()
+#             result = process_user_prompt(user_input, history)
 
-            if result.get("finalized"):
-                print("\n--- FINALIZED INTENT ---")
-                print(result["clean_prompt"])
-                print("------------------------\n")
-                break
+#             if result.get("finalized"):
+#                 print("\n--- FINALIZED INTENT ---")
+#                 print(result["clean_prompt"])
+#                 print("------------------------\n")
+#                 break
 
-            if result["stop"]:
-                print(f"\nAssistant: {result['reply']}\n")
-            else:
-                print("\n--- INTENT UPDATED ---")
-                print("Refining Mode:", result.get("refining", False))
-                print("Improved Prompt:", result["clean_prompt"])
-                print("Confidence:", result["confidence"])
-                print("----------------------\n")
+#             if result["stop"]:
+#                 print(f"\nAssistant: {result['reply']}\n")
+#             else:
+#                 print("\n--- INTENT UPDATED ---")
+#                 print("Refining Mode:", result.get("refining", False))
+#                 print("Improved Prompt:", result["clean_prompt"])
+#                 print("Confidence:", result["confidence"])
+#                 print("----------------------\n")
 
-        except KeyboardInterrupt:
-            print("\nGoodbye!\n")
-            break
+#         except KeyboardInterrupt:
+#             print("\nGoodbye!\n")
+#             break

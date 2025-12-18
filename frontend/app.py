@@ -1,70 +1,167 @@
+# import streamlit as st
+# import requests
+
+# BACKEND_URL = "http://localhost:8000/analyze"
+
+# st.set_page_config(
+#     page_title="Custom Logic AI Assistant",
+#     layout="centered"
+# )
+
+# st.title("Custom Logic AI Assistant")
+# st.write("Analyze prompts using rule-based + LLM categorization logic.")
+
+# prompt = st.text_area(
+#     "Enter your prompt",
+#     height=120,
+#     placeholder="Example: Create an automation that runs every Monday..."
+# )
+
+# analyze_btn = st.button("Analyze Prompt")
+
+# if analyze_btn:
+#     if not prompt.strip():
+#         st.warning("Please enter a prompt.")
+#     else:
+#         with st.spinner("Analyzing prompt..."):
+#             try:
+#                 response = requests.post(
+#                     BACKEND_URL,
+#                     json={"prompt": prompt},
+#                     timeout=30
+#                 )
+
+#                 if response.status_code == 200:
+#                     result = response.json()
+
+#                     st.subheader("Analysis Result")
+
+#                     # Show success message
+#                     st.success(result.get("message", "Prompt analyzed."))
+
+#                     data = result.get("data", {})
+#                     categorization = data.get("categorization", {})
+
+#                     techniques = categorization.get("techniques", [])
+#                     confidence = categorization.get("confidence")
+
+#                     if techniques:
+#                         st.markdown("**Techniques Identified:**")
+#                         for t in techniques:
+#                             st.markdown(f"- {t}")
+#                     else:
+#                         st.info("No techniques identified.")
+
+#                     if confidence is not None:
+#                         st.markdown(f"**Confidence Score:** `{confidence}`")
+#                     else:
+#                         st.info("Confidence score not available.")
+
+#                     # Optional: show raw JSON for debugging
+#                     with st.expander("Raw API Response"):
+#                         st.json(result)
+
+#                 else:
+#                     st.error(f"Backend error: {response.status_code}")
+#                     st.text(response.text)
+
+#             except requests.exceptions.RequestException as e:
+#                 st.error("Unable to connect to backend.")
+#                 st.text(str(e))
 import streamlit as st
+import uuid
 import requests
 
-BACKEND_URL = "http://localhost:8000/analyze"
+# Backend endpoints
+CHAT_URL = "http://localhost:8000/chat"
+ANALYZE_URL = "http://localhost:8000/analyze"
 
-st.set_page_config(
-    page_title="Custom Logic AI Assistant",
-    layout="centered"
-)
+# ----------------------------------------------------------
+# PAGE SETUP
+# ----------------------------------------------------------
+st.set_page_config(page_title="Workflow Builder Assistant", layout="centered")
+st.title("🤖 Workflow Builder Assistant")
 
-st.title("Custom Logic AI Assistant")
-st.write("Analyze prompts using rule-based + LLM categorization logic.")
+# Choice between chat mode and analyze mode
+mode = st.radio("Choose mode:", ["Workflow Builder (Chat)"])
 
-prompt = st.text_area(
-    "Enter your prompt",
-    height=120,
-    placeholder="Example: Create an automation that runs every Monday..."
-)
 
-analyze_btn = st.button("Analyze Prompt")
+# ==========================================================
+# MODE 1 — MULTI-TURN WORKFLOW BUILDER (CHAT)
+# ==========================================================
+if mode == "Workflow Builder (Chat)":
 
-if analyze_btn:
-    if not prompt.strip():
-        st.warning("Please enter a prompt.")
-    else:
-        with st.spinner("Analyzing prompt..."):
-            try:
-                response = requests.post(
-                    BACKEND_URL,
-                    json={"prompt": prompt},
-                    timeout=30
-                )
+    # New session ID if first time
+    if "session_id" not in st.session_state:
+        st.session_state.session_id = str(uuid.uuid4())
 
-                if response.status_code == 200:
-                    result = response.json()
+    # Conversation history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-                    st.subheader("Analysis Result")
+    user_message = st.text_input("You:", placeholder="Describe the workflow you want to build...")
 
-                    # Show success message
-                    st.success(result.get("message", "Prompt analyzed."))
+    send = st.button("Send")
 
-                    data = result.get("data", {})
-                    categorization = data.get("categorization", {})
+    if send and user_message.strip():
 
-                    techniques = categorization.get("techniques", [])
-                    confidence = categorization.get("confidence")
+        # Add user message to UI
+        st.session_state.messages.append(("user", user_message))
 
-                    if techniques:
-                        st.markdown("**Techniques Identified:**")
-                        for t in techniques:
-                            st.markdown(f"- {t}")
-                    else:
-                        st.info("No techniques identified.")
+        # Send message to backend
+        res = requests.post(
+            CHAT_URL,
+            json={
+                "session_id": st.session_state.session_id,
+                "message": user_message
+            }
+        ).json()
 
-                    if confidence is not None:
-                        st.markdown(f"**Confidence Score:** `{confidence}`")
-                    else:
-                        st.info("Confidence score not available.")
+        # --------------------------------------------------
+        # FINALIZATION CASE
+        # --------------------------------------------------
+        if res.get("finalized"):
 
-                    # Optional: show raw JSON for debugging
-                    with st.expander("Raw API Response"):
-                        st.json(result)
+            final_intent = res["final_intent"]
+            analysis = res["analysis"]
 
-                else:
-                    st.error(f"Backend error: {response.status_code}")
-                    st.text(response.text)
+            # Display results
+            st.success("🎉 Final Workflow Intent")
+            st.write(final_intent)
 
-            except requests.exceptions.RequestException as e:
-                st.error("Unable to connect to backend.")
-                st.text(str(e))
+            st.subheader("🔍 Analysis of Final Intent")
+            st.json(analysis)
+
+            # Reset session
+            st.session_state.session_id = str(uuid.uuid4())
+            st.session_state.messages = []
+
+        else:
+            # Continue the refinement chat
+            reply = res["response"]
+            st.session_state.messages.append(("assistant", reply))
+
+    # --------------------------------------------------
+    # DISPLAY CHAT HISTORY
+    # --------------------------------------------------
+    st.write("---")
+    st.subheader("Conversation")
+
+    for role, msg in st.session_state.messages:
+        if role == "user":
+            st.markdown(f"**👤 You:** {msg}")
+        else:
+            st.markdown(f"**🤖 Assistant:** {msg}")
+
+
+# # ==========================================================
+# # MODE 2 — SIMPLE PROMPT ANALYZER
+# # ==========================================================
+# elif mode == "Analyze Prompt":
+
+#     prompt = st.text_area("Enter text to analyze")
+
+#     if st.button("Analyze"):
+#         if prompt.strip():
+#             response = requests.post(ANALYZE_URL, json={"prompt": prompt}).json()
+#             st.json(response)

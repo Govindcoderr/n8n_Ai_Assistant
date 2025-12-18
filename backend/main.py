@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.llm_config import get_llm
+from backend.llm import process_user_prompt
+from typing import Dict
 from backend.mytools.categorize_prompt import create_categorize_prompt_tool
 
 
@@ -58,7 +60,75 @@ def analyze(req: AnalyzeRequest):
 
 
 
+# -----------------------------
+# /chat ENDPOINT (MULTI-TURN REFINEMENT)
+# -----------------------------
 
+class ChatRequest(BaseModel):
+    session_id: str
+    message: str
+
+
+class ChatSession:
+    def __init__(self):
+        self.history = []
+
+
+SESSIONS: Dict[str, ChatSession] = {}
+
+
+@app.post("/chat")
+def chat(req: ChatRequest):
+
+    # Create new session if needed
+    if req.session_id not in SESSIONS:
+        SESSIONS[req.session_id] = ChatSession()
+
+    session = SESSIONS[req.session_id]
+
+    # Process the message using your multi-turn engine
+    result = process_user_prompt(req.message, session.history)
+
+    # --------------------------------------------------------
+    # FINALIZATION CASE
+    # --------------------------------------------------------
+    if result.get("finalized"):
+
+        final_intent = result["clean_prompt"]
+
+        # (1) CALL /analyze API EXTERNALLY
+        import requests
+        analyze_response = requests.post(
+            "http://localhost:8000/analyze",
+            json={"prompt": final_intent}
+        ).json()
+
+        # (2) Remove session
+        del SESSIONS[req.session_id]
+
+        # (3) Return BOTH final intent + analysis results
+        return {
+            "finalized": True,
+            "final_intent": final_intent,
+            "analysis": analyze_response
+        }
+
+    # --------------------------------------------------------
+    # CLARIFICATION NEEDED
+    # --------------------------------------------------------
+    if result.get("stop"):
+        return {
+            "finalized": False,
+            "response": result["reply"]
+        }
+
+    # --------------------------------------------------------
+    # NORMAL UPDATE
+    # --------------------------------------------------------
+    return {
+        "finalized": False,
+        "response": result["clean_prompt"]
+    }
 
 
 
