@@ -43,8 +43,6 @@ TechniqueDescription = {
 #     techniques: List[WorkflowTechnique]
 #     confidence: Optional[float]
 
-
-
 @dataclass
 class PromptCategorization:
     techniques: List[str]
