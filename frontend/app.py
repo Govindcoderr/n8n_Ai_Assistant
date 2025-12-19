@@ -270,7 +270,13 @@ if mode == "Workflow Builder (Chat)":
             st.session_state.session_id = str(uuid.uuid4())
             st.session_state.messages = []
 
-                else:
+        else:
+            try:
+                response = requests.post(CHAT_URL, json={
+                    "session_id": st.session_state.session_id,
+                    "message": "__FINALIZE__"
+                })
+                if response.status_code != 200:
                     st.error(f"Backend error: {response.status_code}")
                     st.text(response.text)
 
