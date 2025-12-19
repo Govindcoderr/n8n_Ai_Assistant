@@ -496,18 +496,111 @@ Return JSON exactly in this structure:
 # MAIN INTENT PROCESSOR
 # -------------------------------------------------------------------------
 
+# def process_user_prompt(user_input: str, history: List[dict]) -> dict:
+#     global last_intent_message, is_refining
+
+#     history.append({"role": "user", "content": user_input})
+
+#     # 1. Finalization
+#     if is_refining and user_wants_to_finalize(user_input):
+#            # Use the last refined intent if exists
+#         if last_intent_message:
+#             final = last_intent_message
+#         else:
+#             # fallback: previous user message
+#             final = history[-2]["content"] if len(history) >= 2 else user_input
+
+#         is_refining = False
+
+#         return {
+#             "stop": False,
+#             "finalized": True,
+#             "clean_prompt": final,
+#             "intent": None,
+#             "confidence": 1.0
+#         }
+
+#     # 2. Guard Layer
+#     guard_result = guard_input(user_input, history)
+#     if guard_result and not is_refining:
+#         history.append({"role": "assistant", "content": guard_result.followup_question})
+#         return {"stop": True, "reply": guard_result.followup_question}
+
+#     # 3. Follow-up merging
+#     if last_intent_message is not None:
+#         if llm_is_followup(last_intent_message, user_input):
+#             merged = f"{last_intent_message}. Modify it as follows: {user_input}"
+#             result = llm_classify_and_improve(merged, history)
+
+#             if result.categorization.intent_status == "clear":
+#                 last_intent_message = result.improved_prompt
+#                 is_refining = True
+#                 return {
+#                     "stop": False,
+#                     "refining": True,
+#                     "clean_prompt": result.improved_prompt,
+#                     "intent": result.categorization.intent_label,
+#                     "confidence": result.categorization.confidence
+#                 }
+
+#     # 4. Standard intent creation
+#     result = llm_classify_and_improve(user_input, history)
+
+#     if result.categorization.intent_status != "clear":
+#         history.append({"role": "assistant", "content": result.followup_question})
+#         return {"stop": True, "reply": result.followup_question}
+
+#     # 5. Start refining mode
+#     last_intent_message = result.improved_prompt
+#     is_refining = True
+
+#     return {
+#         "stop": False,
+#         "refining": True,
+#         "clean_prompt": result.improved_prompt,
+#         "intent": result.categorization.intent_label,
+#         "confidence": result.categorization.confidence
+#     }
 def process_user_prompt(user_input: str, history: List[dict]) -> dict:
     global last_intent_message, is_refining
 
     history.append({"role": "user", "content": user_input})
 
+    # ================================================================
+    # NEW: Universal finalization (DONE button support)
+    # ================================================================
+    if user_wants_to_finalize(user_input):
+        final = last_intent_message or (
+            history[-2]["content"] if len(history) >= 2 else user_input
+        )
+        is_refining = False
+        return {
+            "stop": False,
+            "finalized": True,
+            "clean_prompt": final,
+            "intent": None,
+            "confidence": 1.0
+        }
+
+    # ================================================================
+    # NEW: Semantic workflow detection (allows complex workflow inputs)
+    # ================================================================
+    workflow_keywords = [
+        "workflow", "node", "trigger", "api", "http", "update",
+        "metadata", "caption", "youtube", "slack", "telegram",
+        "transcript", "append", "set", "extract", "google",
+        "batch", "process", "automation", "video", "split"
+    ]
+    user_lower = user_input.lower()
+    contains_workflow = any(k in user_lower for k in workflow_keywords)
+    long_instruction = len(user_input.split()) >= 12
+    semantic_accept = contains_workflow or long_instruction
+
     # 1. Finalization
     if is_refining and user_wants_to_finalize(user_input):
-           # Use the last refined intent if exists
         if last_intent_message:
             final = last_intent_message
         else:
-            # fallback: previous user message
             final = history[-2]["content"] if len(history) >= 2 else user_input
 
         is_refining = False
@@ -522,7 +615,11 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
 
     # 2. Guard Layer
     guard_result = guard_input(user_input, history)
-    if guard_result and not is_refining:
+
+    # ================================================================
+    # NEW: Bypass guard IF workflow detected
+    # ================================================================
+    if guard_result and not is_refining and not semantic_accept:
         history.append({"role": "assistant", "content": guard_result.followup_question})
         return {"stop": True, "reply": guard_result.followup_question}
 
@@ -546,7 +643,10 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
     # 4. Standard intent creation
     result = llm_classify_and_improve(user_input, history)
 
-    if result.categorization.intent_status != "clear":
+    # ================================================================
+    # NEW: allow unclear classification IF workflow-like input
+    # ================================================================
+    if result.categorization.intent_status != "clear" and not semantic_accept:
         history.append({"role": "assistant", "content": result.followup_question})
         return {"stop": True, "reply": result.followup_question}
 
