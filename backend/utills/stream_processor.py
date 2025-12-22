@@ -19,7 +19,6 @@ StreamEvent = Union[SubgraphEvent, ParentEvent]
 
 # BUILDER TOOL TYPES
 
-
 class BuilderToolBase:
     def __init__(
         self,
@@ -33,7 +32,6 @@ class BuilderToolBase:
 
 
 # CONFIGURATION
-
 
 DEFAULT_WORKFLOW_UPDATE_TOOLS = [
     "add_nodes",

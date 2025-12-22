@@ -1,5 +1,5 @@
-from mytools.best_practices import BestPracticesDocument
-from mytypes.categorization import WorkflowTechnique
+from backend.mytypes.best_practice import BestPracticesDocument
+from backend.mytypes.categorization import WorkflowTechnique
 
 class TriageBestPractices(BestPracticesDocument):
     technique = WorkflowTechnique.TRIAGE
@@ -202,3 +202,8 @@ Purpose: Log triage outcomes, track metrics, store classification history
 - Track metrics: category volumes, error rates, processing times
 - Set up alerts for anomalies (e.g., sudden spike in unclassified items)
 - Review misclassifications regularly to improve rules/prompts """
+
+
+    def get_documentation(self) -> str:
+      return self._documentation  
+    

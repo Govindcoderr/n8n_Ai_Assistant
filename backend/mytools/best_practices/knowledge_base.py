@@ -1,12 +1,12 @@
-from  mytools.best_practices import BestPracticesDocument
-from mytypes.categorization import WorkflowTechnique
+from backend.mytypes.best_practice import BestPracticesDocument
+from backend.mytypes.categorization import WorkflowTechnique
 
-class DocumentProcessingBestPractices(BestPracticesDocument):
-    technique = WorkflowTechnique.DOCUMENT_PROCESSING
+class KnowledgeBaseBestPractices(BestPracticesDocument):
+    technique = WorkflowTechnique.KNOWLEDGE_BASE
     version = "1.0.0"
 
     def __init__(self) -> None:
-        self._documentation = """# Best Practices: Document Processing Workflows
+        self._documentation = """# Best Practices: Knowledge Base Workflows
 
 ## Workflow Design
 

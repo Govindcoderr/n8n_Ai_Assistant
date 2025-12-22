@@ -1,12 +1,12 @@
-from mytools.best_practices import BestPracticesDocument
-from mytypes.categorization import WorkflowTechnique
+from backend.mytypes.best_practice import BestPracticesDocument
+from backend.mytypes.categorization import WorkflowTechnique
 
 class SchedulingBestPractices(BestPracticesDocument):
     technique = WorkflowTechnique.SCHEDULING
     version = "1.0.0"
 
     def __init__(self) -> None:
-        self._documentation = """# Best Practices: Data Extraction Workflows
+        self._documentation = """# Best Practices: Scheduling Workflows
 
 ## Workflow Design
 
@@ -275,4 +275,4 @@ Use Cases:
 - Use interval mode for simple schedules """
   
     def get_documentation(self) -> str:
-        return self._documentation 
+        return self._documentation

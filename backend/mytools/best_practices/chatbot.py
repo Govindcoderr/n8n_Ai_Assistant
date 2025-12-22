@@ -1,5 +1,6 @@
-from backend.mytools.best_practices import BestPracticesDocument
-from backend.mytypes.categorization   import WorkflowTechnique
+from backend.mytypes.best_practice import BestPracticesDocument
+from backend.mytypes.categorization import WorkflowTechnique
+
 
 
 class ChatbotBestPractices(BestPracticesDocument):

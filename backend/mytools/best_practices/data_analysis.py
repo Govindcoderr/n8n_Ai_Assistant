@@ -1,5 +1,5 @@
-from mytools.best_practices import BestPracticesDocument
-from mytypes.categorization import WorkflowTechnique
+from backend.mytypes.best_practice import BestPracticesDocument
+from backend.mytypes.categorization import WorkflowTechnique
 
 
 class DataAnalysisBestPractices(BestPracticesDocument):
