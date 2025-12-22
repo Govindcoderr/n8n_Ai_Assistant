@@ -70,106 +70,6 @@
 #                 st.text(str(e))
 
 
-
-# import streamlit as st
-# import uuid
-# import requests
-
-# # Backend endpoints
-# CHAT_URL = "http://localhost:8000/chat"
-# ANALYZE_URL = "http://localhost:8000/analyze"
-
-# # ----------------------------------------------------------
-# # PAGE SETUP
-# # ----------------------------------------------------------
-# st.set_page_config(page_title="Workflow Builder Assistant", layout="centered")
-# st.title("🤖 Workflow Builder Assistant")
-
-# # Choice between chat mode and analyze mode
-# mode = st.radio("Choose mode:", ["Workflow Builder (Chat)"])
-
-
-# # ==========================================================
-# # MODE 1 — MULTI-TURN WORKFLOW BUILDER (CHAT)
-# # ==========================================================
-# if mode == "Workflow Builder (Chat)":
-
-#     # New session ID if first time
-#     if "session_id" not in st.session_state:
-#         st.session_state.session_id = str(uuid.uuid4())
-
-#     # Conversation history
-#     if "messages" not in st.session_state:
-#         st.session_state.messages = []
-
-#     user_message = st.text_input("You:", placeholder="Describe the workflow you want to build...")
-
-#     send = st.button("Send")
-
-#     if send and user_message.strip():
-
-#         # Add user message to UI
-#         st.session_state.messages.append(("user", user_message))
-
-#         # Send message to backend
-#         res = requests.post(
-#             CHAT_URL,
-#             json={
-#                 "session_id": st.session_state.session_id,
-#                 "message": user_message
-#             }
-#         ).json()
-
-#         # --------------------------------------------------
-#         # FINALIZATION CASE
-#         # --------------------------------------------------
-#         if res.get("finalized"):
-
-#             final_intent = res["final_intent"]
-#             analysis = res["analysis"]
-
-#             # Display results
-#             st.success("🎉 Final Workflow Intent")
-#             st.write(final_intent)
-
-#             st.subheader("🔍 Analysis of Final Intent")
-#             st.json(analysis)
-
-#             # Reset session
-#             st.session_state.session_id = str(uuid.uuid4())
-#             st.session_state.messages = []
-
-#         else:
-#             # Continue the refinement chat
-#             reply = res["response"]
-#             st.session_state.messages.append(("assistant", reply))
-
-#     # --------------------------------------------------
-#     # DISPLAY CHAT HISTORY
-#     # --------------------------------------------------
-#     st.write("---")
-#     st.subheader("Conversation")
-
-#     for role, msg in st.session_state.messages:
-#         if role == "user":
-#             st.markdown(f"**👤 You:** {msg}")
-#         else:
-#             st.markdown(f"**🤖 Assistant:** {msg}")
-
-
-# # # ==========================================================
-# # # MODE 2 — SIMPLE PROMPT ANALYZER
-# # # ==========================================================
-# # elif mode == "Analyze Prompt":
-
-# #     prompt = st.text_area("Enter text to analyze")
-
-# #     if st.button("Analyze"):
-# #         if prompt.strip():
-# #             response = requests.post(ANALYZE_URL, json={"prompt": prompt}).json()
-# #             st.json(response)
-
-
 # frontend/app.py
 
 import streamlit as st
@@ -271,15 +171,17 @@ if mode == "Workflow Builder (Chat)":
             st.session_state.messages = []
 
         else:
-            try:
-                response = requests.post(CHAT_URL, json={
-                    "session_id": st.session_state.session_id,
-                    "message": "__FINALIZE__"
-                })
-                if response.status_code != 200:
-                    st.error(f"Backend error: {response.status_code}")
-                    st.text(response.text)
+            st.error("❌ Backend did not finalize. Try again.")
 
-            except requests.exceptions.RequestException as e:
-                st.error("Unable to connect to backend.")
-                st.text(str(e))
+
+    # ------------------------------------------------------
+    # DISPLAY CONVERSATION
+    # ------------------------------------------------------
+    st.write("---")
+    st.subheader("Conversation")
+
+    for role, msg in st.session_state.messages:
+        if role == "user":
+            st.markdown(f"**👤 You:** {msg}")
+        else:
+            st.markdown(f"**🤖 Assistant:** {msg}")
