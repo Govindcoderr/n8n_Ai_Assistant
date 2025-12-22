@@ -89,3 +89,4 @@ def normalize_techniques(raw_techniques: List[str]) -> List[WorkflowTechnique]:
                 normalized.add(enum_value)
 
     return list(normalized)
+
