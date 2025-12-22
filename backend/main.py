@@ -1,70 +1,4 @@
 # backend/main.py: govind  - Entry point for the Custom Logic AI Assistant backend API
-# # backend/main.py - Entry point for the Custom Logic AI Assistant backend API
-
-# from fastapi import FastAPI
-# from fastapi.middleware.cors import CORSMiddleware
-# from pydantic import BaseModel
-# from backend.llm_config import get_llm
-# from backend.llm import process_user_prompt
-# from typing import Dict
-# from backend.mytools.categorize_prompt import create_categorize_prompt_tool
-# from backend.mytools.find_best_practice import create_get_best_practices_tool
-# from backend.mytools.best_practices import documentation
-# app = FastAPI()
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
-# class AnalyzeRequest(BaseModel):
-#     prompt: str
-    
-# @app.post("/analyze")
-# def analyze(req: AnalyzeRequest):
-#     llm = get_llm()
-#     categorize_prompt = create_categorize_prompt_tool(llm)
-
-#     result = categorize_prompt({"prompt": req.prompt})
-     
-#     findbest = create_get_best_practices_tool(result)
-
-#     # Defensive extraction
-#     if not isinstance(findbest, dict):
-#         return {
-#             "success": False,
-#             "message": "Unexpected tool response format",
-#             "data": None
-#         }
-
-#     data = findbest.get("data", {})
-#     categorization = data.get("categorization", {})
-
-#     techniques = categorization.get("techniques", [])
-#     confidence = categorization.get("confidence")
-
-#     return {
-#         "success": True,
-#         "message": result.get(
-#             "message",
-#             "Prompt categorized successfully"
-#         ),
-#         "data": {
-#             "categorization": {
-#                 "techniques": techniques,
-#                 "confidence": confidence
-#             },
-#             "techniqueCategories": data.get("techniqueCategories", [])
-#         }
-#     }
-
-
-
-
-# backend/main.py - Entry point for the Custom Logic AI Assistant backend API
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -100,7 +34,7 @@ def analyze(req: AnalyzeRequest):
 
     raw_techniques = categorization.get("techniques", [])
     print("Raw Techniques:", raw_techniques)
-    result = categorize_prompt({"prompt": req.prompt})
+    result = categorize_result
 
     # Defensive extraction
     if not isinstance(result, dict):
@@ -113,9 +47,9 @@ def analyze(req: AnalyzeRequest):
     data = result.get("data", {})
     categorization = data.get("categorization", {})
 
-    techniques = categorization.get("techniques", [])
+    # techniques = categorization.get("techniques", [])
     confidence = categorization.get("confidence")
-    print("Confidence:", confidence)
+    # print("Confidence:", confidence)
 
     # 2️ Normalize techniques
     normalized_techniques = normalize_techniques(raw_techniques)
@@ -154,198 +88,80 @@ def analyze(req: AnalyzeRequest):
         }
     }
 
+# # -----------------------------
+# # /chat ENDPOINT (MULTI-TURN REFINEMENT)
+# # -----------------------------
+
+# class ChatRequest(BaseModel):
+#     session_id: str
+#     message: str
 
 
-# -----------------------------
-# /chat ENDPOINT (MULTI-TURN REFINEMENT)
-# -----------------------------
-
-class ChatRequest(BaseModel):
-    session_id: str
-    message: str
+# class ChatSession:
+#     def __init__(self):
+#         self.history = []
 
 
-class ChatSession:
-    def __init__(self):
-        self.history = []
+# SESSIONS: Dict[str, ChatSession] = {}
 
 
-SESSIONS: Dict[str, ChatSession] = {}
+# @app.post("/chat")
+# def chat(req: ChatRequest):
 
+#     # Handle DONE button
+#     if req.message == "__FINALIZE__":
+#         req.message = "done"
 
-@app.post("/chat")
-def chat(req: ChatRequest):
+#     # Create session if needed
+#     if req.session_id not in SESSIONS:
+#         SESSIONS[req.session_id] = ChatSession()
 
-    # Handle DONE button
-    if req.message == "__FINALIZE__":
-        req.message = "done"
+#     session = SESSIONS[req.session_id]
 
-    # Create session if needed
-    if req.session_id not in SESSIONS:
-        SESSIONS[req.session_id] = ChatSession()
+#     # Process user input via multi-turn engine
+#     result = process_user_prompt(req.message, session.history)
 
-    session = SESSIONS[req.session_id]
+#     # -------------------------------------------------------
+#     # FINALIZATION FLOW
+#     # -------------------------------------------------------
+#     if result.get("finalized"):
 
-    # Process user input via multi-turn engine
-    result = process_user_prompt(req.message, session.history)
+#         final_intent = result["clean_prompt"]
 
-    # -------------------------------------------------------
-    # FINALIZATION FLOW
-    # -------------------------------------------------------
-    if result.get("finalized"):
+#         # Automatically call /analyze API
+#         import requests
+#         analysis = requests.post(
+#             "http://localhost:8000/analyze",
+#             json={"prompt": final_intent}
+#         ).json()
 
-        final_intent = result["clean_prompt"]
+#         # Remove session
+#         del SESSIONS[req.session_id]
 
-        # Automatically call /analyze API
-        import requests
-        analysis = requests.post(
-            "http://localhost:8000/analyze",
-            json={"prompt": final_intent}
-        ).json()
-
-        # Remove session
-        del SESSIONS[req.session_id]
-
-        # Return both final intent and analysis
-        return {
-            "finalized": True,
-            "final_intent": final_intent,
-            "analysis": analysis
-        }
-
-    # -------------------------------------------------------
-    # CLARIFICATION NEEDED
-    # -------------------------------------------------------
-    if result.get("stop"):
-        return {
-            "finalized": False,
-            "response": result["reply"]
-        }
-
-    # -------------------------------------------------------
-    # NORMAL CONTINUATION
-    # -------------------------------------------------------
-    return {
-        "finalized": False,
-        "response": result["clean_prompt"]
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# from llm_config import get_llm
-# from backend.mytools.categorize_prompt import create_categorize_prompt_tool
-
-# llm = get_llm()
-# categorize_tool = create_categorize_prompt_tool(llm)
-
-# result = categorize_tool({
-#     "prompt": "Create an n8n form with a lead generation form I can embed on my website homepage. Build an automation that processes form submissions, uses AI to qualify the lead, sends data to an n8n data table. For high-score leads, it should also email them to offer to schedule a 15-min call in a free slot in my calendar."
-# })
-
-# print(result)
-
-
-
-# # backend/main.py
-# from fastapi import FastAPI
-# from fastapi.middleware.cors import CORSMiddleware
-# from pydantic import BaseModel
-
-# from backend.llm_config import get_llm
-# from backend.mytools.categorize_prompt import create_categorize_prompt_tool
-# from backend.mytools.find_best_practice import create_get_best_practices_tool
-# from backend.mytypes.technique_normalizer import normalize_techniques
-
-
-# app = FastAPI()
-
-# # CORS setup
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
-
-# class AnalyzeRequest(BaseModel):
-#     prompt: str
-
-
-# @app.post("/analyze")
-# def analyze(req: AnalyzeRequest):
-#     try:
-#         # ------------------------------
-#         # 1️⃣ Load LLM
-#         # ------------------------------
-#         llm = get_llm()
-
-#         # ------------------------------
-#         # 2️⃣ Categorization Tool
-#         # ------------------------------
-#         categorize_tool = create_categorize_prompt_tool(llm)
-
-#         categorize_result = categorize_tool.invoke({
-#             "prompt": req.prompt
-#         })
-
-#         categorization = categorize_result.get("data", {}).get("categorization", {})
-#         raw_techniques = categorization.get("techniques", [])
-#         confidence = categorization.get("confidence")
-
-#         # ------------------------------
-#         # 3️⃣ Normalize Techniques
-#         # ------------------------------
-#         normalized_techniques = normalize_techniques(raw_techniques)
-
-#         # ------------------------------
-#         # 4️⃣ Best Practices Tool
-#         # ------------------------------
-#         best_practice_tool_data = create_get_best_practices_tool()
-#         best_practice_tool = best_practice_tool_data.get("tool")
-
-#         best_practices_result = {}
-
-#         if best_practice_tool and normalized_techniques:
-#             # IMPORTANT: Python LangChain tools accept kwargs only
-#             best_practices_result = best_practice_tool.invoke({
-#                 "techniques": normalized_techniques
-#             })
-
-#         # ------------------------------
-#         # 5️⃣ Final Response
-#         # ------------------------------
+#         # Return both final intent and analysis
 #         return {
-#             "success": True,
-#             "message": "Prompt categorized successfully",
-#             "data": {
-#                 "categorization": {
-#                     "techniques": raw_techniques,
-#                     "confidence": confidence
-#                 },
-#                 "techniqueCategories": best_practices_result.get("data", {}).get("message", "")
-#             }
+#             "finalized": True,
+#             "final_intent": final_intent,
+#             "analysis": analysis
 #         }
 
-#     except Exception as e:
+#     # -------------------------------------------------------
+#     # CLARIFICATION NEEDED
+#     # -------------------------------------------------------
+#     if result.get("stop"):
 #         return {
-#             "success": False,
-#             "message": "Error processing request",
-#             "error": str(e)
+#             "finalized": False,
+#             "response": result["reply"]
 #         }
+
+#     # -------------------------------------------------------
+#     # NORMAL CONTINUATION
+#     # -------------------------------------------------------
+#     return {
+#         "finalized": False,
+#         "response": result["clean_prompt"]
+#     }
+
 
 
 
@@ -410,8 +226,6 @@ def chat(req: ChatRequest):
 #         best_practice_result = {"message": "Best practices tool unavailable", "data": {}}
   
 
-
- 
 #     return {
 #         "success": True,
 #         "message": result.get(
