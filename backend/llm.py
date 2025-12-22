@@ -501,13 +501,41 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
 
     history.append({"role": "user", "content": user_input})
 
+    # ================================================================
+    # NEW: Universal finalization (DONE button support)
+    # ================================================================
+    if user_wants_to_finalize(user_input):
+        final = last_intent_message or (
+            history[-2]["content"] if len(history) >= 2 else user_input
+        )
+        is_refining = False
+        return {
+            "stop": False,
+            "finalized": True,
+            "clean_prompt": final,
+            "intent": None,
+            "confidence": 1.0
+        }
+
+    # ================================================================
+    # NEW: Semantic workflow detection (allows complex workflow inputs)
+    # ================================================================
+    workflow_keywords = [
+        "workflow", "node", "trigger", "api", "http", "update",
+        "metadata", "caption", "youtube", "slack", "telegram",
+        "transcript", "append", "set", "extract", "google",
+        "batch", "process", "automation", "video", "split"
+    ]
+    user_lower = user_input.lower()
+    contains_workflow = any(k in user_lower for k in workflow_keywords)
+    long_instruction = len(user_input.split()) >= 12
+    semantic_accept = contains_workflow or long_instruction
+
     # 1. Finalization
     if is_refining and user_wants_to_finalize(user_input):
-           # Use the last refined intent if exists
         if last_intent_message:
             final = last_intent_message
         else:
-            # fallback: previous user message
             final = history[-2]["content"] if len(history) >= 2 else user_input
 
         is_refining = False
@@ -522,7 +550,11 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
 
     # 2. Guard Layer
     guard_result = guard_input(user_input, history)
-    if guard_result and not is_refining:
+
+    # ================================================================
+    # NEW: Bypass guard IF workflow detected
+    # ================================================================
+    if guard_result and not is_refining and not semantic_accept:
         history.append({"role": "assistant", "content": guard_result.followup_question})
         return {"stop": True, "reply": guard_result.followup_question}
 
@@ -546,7 +578,10 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
     # 4. Standard intent creation
     result = llm_classify_and_improve(user_input, history)
 
-    if result.categorization.intent_status != "clear":
+    # ================================================================
+    # NEW: allow unclear classification IF workflow-like input
+    # ================================================================
+    if result.categorization.intent_status != "clear" and not semantic_accept:
         history.append({"role": "assistant", "content": result.followup_question})
         return {"stop": True, "reply": result.followup_question}
 
@@ -562,37 +597,3 @@ def process_user_prompt(user_input: str, history: List[dict]) -> dict:
         "confidence": result.categorization.confidence
     }
 
-
-# -------------------------------------------------------------------------
-# CLI LOOP
-# -------------------------------------------------------------------------
-
-# if __name__ == "__main__":
-#     history = []
-
-#     print("n8n Workflow AI Assistant — Multi-Turn Refinement Mode Enabled")
-#     print("Type your message. Ctrl+C to exit.\n")
-
-#     while True:
-#         try:
-#             user_input = input("You: ").strip()
-#             result = process_user_prompt(user_input, history)
-
-#             if result.get("finalized"):
-#                 print("\n--- FINALIZED INTENT ---")
-#                 print(result["clean_prompt"])
-#                 print("------------------------\n")
-#                 break
-
-#             if result["stop"]:
-#                 print(f"\nAssistant: {result['reply']}\n")
-#             else:
-#                 print("\n--- INTENT UPDATED ---")
-#                 print("Refining Mode:", result.get("refining", False))
-#                 print("Improved Prompt:", result["clean_prompt"])
-#                 print("Confidence:", result["confidence"])
-#                 print("----------------------\n")
-
-#         except KeyboardInterrupt:
-#             print("\nGoodbye!\n")
-#             break

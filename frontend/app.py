@@ -69,7 +69,7 @@
 #                 st.error("Unable to connect to backend.")
 #                 st.text(str(e))
 
-# frontend/app.py : govind work/company_Task/n8n_chatbot_logical/frontend/app.py 
+# frontend/app.py : govind work/company_Task/n8n_chatbot_logical/frontend/app.py
 import streamlit as st
 import requests
 import json
