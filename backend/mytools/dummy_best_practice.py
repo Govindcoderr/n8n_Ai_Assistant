@@ -1,38 +1,29 @@
+# backend/mytools/dummy_best_practice.py
+
 """
-Dummy Best Practice Tool
-Used to validate node-generation and selection logic.
+Generic Best Practice Tool
+Domain-agnostic. Safe for all intents.
 """
 
 def dummy_best_practice():
     """
-    BEST PRACTICE: YouTube Chapter Automation Workflow
+    BEST PRACTICE: API-Driven Automation
 
-    Backend Nodes:
-    - YouTube Get a Video
-    - YouTube Captions
-    - AI Agent
-    - HTTP Request
-
-    Frontend Nodes:
-    - Chat Trigger
-    - Respond to Chat
+    Principles:
+    - The user intent defines the domain
+    - Nodes must be directly related to the intent
+    - Do not invent nodes
+    - If no native node exists, use HTTP Request
 
     Techniques:
-    - API Fetching
-    - Transcript Extraction
-    - AI Semantic Analysis
-    - Metadata Enrichment
-    - Idempotent Updates
-
-    Guidelines:
-    - Always fetch video metadata first
-    - Extract captions before AI analysis
-    - Use AI Agent to detect topic changes
-    - Append chapters, do not overwrite description
+    - REST API integration
+    - OAuth / token-based authentication
+    - Data transformation
+    - Error handling & retries
     """
 
     return {
-        "toolName": "Dummy YouTube Best Practice",
-        "displayTitle": "YouTube Chapter Generation",
+        "toolName": "Generic Automation Best Practice",
+        "displayTitle": "API Automation",
         "tool": lambda: dummy_best_practice
     }

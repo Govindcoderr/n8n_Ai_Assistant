@@ -1,52 +1,52 @@
+# backend/mytools/generate_possible_nodes.py
+
 import json
 from backend.llm_config import get_llm
 
 GENERATE_NODES_PROMPT = """
-You are an n8n workflow expert.
+You are an expert n8n workflow architect.
 
-Workflow Intent:
-{final_intent}
-
-Best Practice:
-{documentation}
+User Intent:
+{{intent}}
 
 Task:
-Based strictly on the best practice above, list ALL n8n nodes
-that could reasonably be used.
+Generate ONLY the n8n nodes REQUIRED to implement this intent.
 
-Rules (VERY IMPORTANT):
+CRITICAL RULES:
+- Nodes must be directly related to the intent topic
+- DO NOT invent nodes
+- Platform names are NOT nodes
+- If no native node exists, use "HTTP Request"
+- Avoid unrelated domains entirely
+
+Allowed node examples:
+- HTTP Request
+- AI Agent
+- Set
+- Merge
+- IF
+- Chat Trigger
+- Respond to Chat
+
+Output requirements:
 - Return ONLY valid JSON
-- Do NOT add explanations
-- Do NOT add markdown
-- Do NOT add text before or after JSON
-- Output must be a JSON array of strings
-- Use real n8n node names
-
-Example output:
-["Chat Trigger", "YouTube Get a Video", "AI Agent"]
+- Output a JSON array of node names
+- No explanations
+- No empty strings
 """
 
-def generate_possible_nodes(final_intent: str, bp_context: dict) -> list:
+def generate_possible_nodes(intent: str, bp_context: dict) -> list:
     llm = get_llm()
 
-    prompt = GENERATE_NODES_PROMPT.format(
-        final_intent=final_intent,
-        documentation=bp_context["documentation"]
-    )
-
+    prompt = GENERATE_NODES_PROMPT.format(intent=intent)
     response = llm.invoke(prompt)
-
-    # ✅ FIX 1: Extract content correctly
-    content = response.content if hasattr(response, "content") else response
+    content = response.content if hasattr(response, "content") else str(response)
 
     try:
         nodes = json.loads(content)
-
-        if isinstance(nodes, list):
-            # remove duplicates while preserving order
-            return list(dict.fromkeys(nodes))
-
-    except Exception as e:
-        print("Failed to parse node list:", content)
-
-    return []
+        return [
+            n for n in nodes
+            if isinstance(n, str) and n.strip()
+        ]
+    except Exception:
+        return []
