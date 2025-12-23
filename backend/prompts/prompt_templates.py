@@ -1,5 +1,5 @@
 from langchain.prompts import PromptTemplate
-from types.categorization import TechniqueDescription
+from backend.mytypes.categorization import TechniqueDescription
 
 EXAMPLE_PROMPTS = """
 - Monitor social channels → monitoring, chatbot, content_generation
