@@ -4,7 +4,7 @@
 from langchain.tools import BaseTool
 from pydantic import BaseModel, validator, ValidationError as PydanticValidationError
 from typing import List
-
+from typing import Type
 from backend.error import ValidationError, ToolExecutionError
 from backend.mytools.best_practices.index import documentation
 from backend.mytools.helpers.progress import create_progress_reporter
@@ -52,8 +52,8 @@ GET_BEST_PRACTICES_TOOL: BuilderToolBase = {
 # Main Tool Implementation
 
 class GetBestPracticesTool(BaseTool):
-    name = GET_BEST_PRACTICES_TOOL["toolName"]
-    description = """
+    name:str = GET_BEST_PRACTICES_TOOL["toolName"]
+    description:str = """
 Retrieve best practices documentation for specific workflow techniques.
 
 Use this tool after categorizing a user's prompt to get relevant guidance on:
@@ -64,7 +64,7 @@ Use this tool after categorizing a user's prompt to get relevant guidance on:
 - General workflow guidance
 """
 
-    args_schema = GetBestPracticesInput
+    args_schema:Type[BaseModel] = GetBestPracticesInput
 
     def _run(self, techniques: List[WorkflowTechnique], config=None):
         reporter = create_progress_reporter(
