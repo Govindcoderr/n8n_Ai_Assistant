@@ -76,7 +76,7 @@ else:
     prompt = st.text_area(
         "Enter your prompt",
         height=120,
-        placeholder="Example: Create an automation that runs every Monday..."
+        placeholder="Example: Create an automation that runs every Monday...."
     )
 
     analyze_btn = st.button("Analyze Prompt")
@@ -120,4 +120,6 @@ else:
                 except requests.exceptions.RequestException as e:
                     st.error("Unable to connect to backend")
                     st.text(str(e))
+
+
 
