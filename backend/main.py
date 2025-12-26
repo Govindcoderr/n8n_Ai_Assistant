@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Dict
 import requests
-
+from backend.node_generator.generator import generate_nodes
 from backend.llm_config import get_llm
 from backend.mytools.categorize_prompt import create_categorize_prompt_tool
 from backend.mytools.find_best_practice import create_get_best_practices_tool
@@ -100,4 +100,19 @@ def chat(req: ChatRequest):
 
     return {"finalized": False, "response": result["clean_prompt"]}
 
+
+# from backend.mytools.select_best_node import generate_nodes_from_analysis
+# class AnalyzeRequest(BaseModel):
+#     prompt: str
+
+# @app.post("/workflow/nodes")
+# def get_workflow_nodes(req: AnalyzeRequest):
+#     analysis = analyze(req)
+#     nodes = generate_nodes_from_analysis(analysis)
+
+#     return {
+#         "success": True,
+#         "techniques": analysis["data"]["categorization"]["techniques"],
+#         "nodes": nodes
+#     }
 
