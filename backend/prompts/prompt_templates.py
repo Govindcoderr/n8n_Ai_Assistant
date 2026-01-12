@@ -1,4 +1,4 @@
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from backend.mytypes.categorization import TechniqueDescription
 
 EXAMPLE_PROMPTS = """
