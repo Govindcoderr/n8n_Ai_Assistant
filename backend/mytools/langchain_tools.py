@@ -10,7 +10,7 @@ from backend.mytools.generate_from_parsed_bp import (
     generate_workflow_from_parsed_bp,
     workflow_to_n8n_format
 )
-from backend.mytools.find_best_practice import create_get_best_practices_tool
+from backend.mytools.find_best_practice_tool import create_get_best_practices_tool
 
 @tool
 def get_registry_nodes(prompt: str, technique: str = "auto") -> List[Dict]:
