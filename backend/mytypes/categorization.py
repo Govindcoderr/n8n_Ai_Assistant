@@ -122,6 +122,7 @@ TechniqueDescription: Dict[WorkflowTechniqueType, str] = {
 
     WorkflowTechnique.HUMAN_IN_THE_LOOP:
         "Pausing for human decision/input before resuming",
+    
 }
 
 @dataclass

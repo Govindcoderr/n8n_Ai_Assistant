@@ -120,6 +120,3 @@ else:
                 except requests.exceptions.RequestException as e:
                     st.error("Unable to connect to backend")
                     st.text(str(e))
-
-
-
