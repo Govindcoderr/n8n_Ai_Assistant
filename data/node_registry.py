@@ -1179,8 +1179,8 @@ sample_nodes = [
 
     {
         "name": "n8n.twilio",
-        "displayName": "Twilio",
-        "description": "Send SMS or WhatsApp messages via Twilio",
+        "displayName": "WhatsApp",
+        "description": "Send SMS or WhatsApp messages via WhatsApp",
         "version": 1,
         "inputs": [NodeConnectionTypes.Main],
         "outputs": [NodeConnectionTypes.Main],
