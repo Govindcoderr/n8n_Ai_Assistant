@@ -3,7 +3,7 @@ from typing import Dict, Any
 
 from backend.Chains.prompt_categorization import prompt_categorization_chain
 from backend.error import ValidationError, ToolExecutionError
-from backend.mytools.helpers.progress  import create_progress_reporter
+from backend.mytools.helpers.progress  import createProgressReporter
 from backend.mytools.helpers.response import (
     create_success_response,
     create_error_response,
@@ -16,6 +16,7 @@ class CategorizePromptSchema(BaseModel):
 
 
 CATEGORIZE_PROMPT_TOOL = {
+    
     "tool_name": "categorize_prompt",
     "display_title": "Categorizing prompt",
 }
@@ -35,7 +36,7 @@ def build_categorization_message(categorization) -> str:
 
 def create_categorize_prompt_tool(llm):
     def tool(input_data: Dict[str, Any]):
-        reporter = create_progress_reporter(
+        reporter = createProgressReporter(
             CATEGORIZE_PROMPT_TOOL["tool_name"],
             CATEGORIZE_PROMPT_TOOL["display_title"],
         )

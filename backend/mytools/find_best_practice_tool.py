@@ -1,19 +1,18 @@
 # File: backend/mytools/find_best_practice.py
-
 from langchain.tools import BaseTool
 from pydantic import BaseModel, validator, ValidationError as PydanticValidationError
 from typing import List
 from typing import Type
 from backend.error import ValidationError, ToolExecutionError
 from backend.mytools.best_practices.index import documentation
-from backend.mytools.helpers.progress import create_progress_reporter
+from backend.mytools.helpers.progress import createProgressReporter
 from backend.mytools.helpers.response import create_success_response, create_error_response
 from backend.mytypes.categorization import WorkflowTechnique
 from backend.utills.stream_processor import BuilderToolBase
 
 # Input Schema (Pydantic)
 
-class GetBestPracticesInput(BaseModel):
+class GetBestPracticesSchema(BaseModel):
     techniques: List[WorkflowTechnique]
 
     @validator("techniques")
@@ -21,7 +20,6 @@ class GetBestPracticesInput(BaseModel):
         if not v or len(v) == 0:
             raise ValueError("At least one technique is required.")
         return v
-
 
 # Helper Function: format documentation
 
@@ -63,10 +61,10 @@ Use this tool after categorizing a user's prompt to get relevant guidance on:
 - General workflow guidance
 """
 
-    args_schema:Type[BaseModel] = GetBestPracticesInput
+    args_schema:Type[BaseModel] = GetBestPracticesSchema
 
     def _run(self, techniques: List[WorkflowTechnique], config=None):
-        reporter = create_progress_reporter(
+        reporter = createProgressReporter(
              config,
             GET_BEST_PRACTICES_TOOL["toolName"],
             # GET_BEST_PRACTICES_TOOL["displayTitle"],
@@ -74,7 +72,7 @@ Use this tool after categorizing a user's prompt to get relevant guidance on:
 
         try:
             # Validate input again (same behavior as n8n)
-            validated = GetBestPracticesInput(techniques=techniques)
+            validated = GetBestPracticesSchema(techniques=techniques)
             techniques = validated.techniques
 
             reporter.start({"techniques": techniques})

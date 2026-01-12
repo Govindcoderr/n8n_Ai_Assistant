@@ -6,9 +6,11 @@ def create_success_response(message: str, data: dict):
     }
 
 
-def create_error_response(error: Exception):
+def create_error_response(error: Exception, config=None):
     return {
         "status": "error",
         "message": str(error),
         "details": getattr(error, "__dict__", {}),
+        "config": config,
     }
+
