@@ -1,0 +1,241 @@
+{
+  "name": "Nearby Events Telegram Notifier",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "fbc57ec3-3f63-4df6-9230-40a14c3850fd",
+      "name": "Check for Events Daily",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "eventsApiUrl",
+              "value": "<__PLACEHOLDER_VALUE__Events API endpoint URL (e.g., Eventbrite, Meetup, or custom API)__>",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "userLocation",
+              "value": "<__PLACEHOLDER_VALUE__Your location (e.g., city name, coordinates, or zip code)__>",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "searchRadius",
+              "value": "<__PLACEHOLDER_VALUE__Search radius in miles or km__>",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "telegramChatId",
+              "value": "<__PLACEHOLDER_VALUE__Your Telegram chat ID__>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "9a927227-0903-46a3-8269-172035bddccc",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        288,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://www.google.com/search?q=test+n8n+http+url&oq=test+n8n+http+url&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRigATIHCAIQIRigATIHCAMQIRigATIHCAQQIRifBTIHCAUQIRiPAtIBCDYwMThqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "location",
+              "value": "={{ $('Workflow Configuration').first().json.userLocation }}"
+            },
+            {
+              "name": "radius",
+              "value": "={{ $('Workflow Configuration').first().json.searchRadius }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "687bf7b3-f3e7-4806-a71d-a66c193a5382",
+      "name": "Fetch Nearby Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        480,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "pythonNative",
+        "pythonCode": "# Add a new field called 'my_new_field' to the JSON of the item\n_item[\"json\"][\"my_new_field\"] = 1\nreturn _item"
+      },
+      "id": "120edf1d-c8bc-4f4b-ae06-6e23be20dd66",
+      "name": "Parse Events Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $('Parse Events Data').item.json.events }}",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "bda20b9b-1192-4201-853b-2008e5a56562",
+      "name": "Check if Events Found",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "message",
+              "value": "=🎉 *Event Found!*\n\n📅 *Event:* {{ $json.name }}\n📆 *Date:* {{ $json.date }}\n📍 *Location:* {{ $json.location }}\n📝 *Description:* {{ $json.description }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "88c4cf3b-7966-4b99-a9f7-2df3ac04efbf",
+      "name": "Format Event Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        -128
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Check for Events Daily": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Fetch Nearby Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Nearby Events": {
+      "main": [
+        [
+          {
+            "node": "Parse Events Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Events Data": {
+      "main": [
+        [
+          {
+            "node": "Check if Events Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Events Found": {
+      "main": [
+        [
+          {
+            "node": "Format Event Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Event Message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "f2caa8f5-6aba-4917-82f2-b9633444ecab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "965cb536076af83e4e73badeccc72e8eb979cd502cc0e55d2329143c12641555"
+  },
+  "id": "ITRdPY54Z3PzWfMHM1EK6",
+  "tags": []
+}
+
+
+

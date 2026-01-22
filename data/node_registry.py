@@ -780,7 +780,7 @@ sample_nodes = [
         "description": "Generate images using models like DALL·E, Imagen, Stable Diffusion",
         "version": 1,
         "inputs": [NodeConnectionTypes.Main],
-        "outputs": [NodeConnectionTypes.Binary],
+        "outputs": [NodeConnectionTypes.Trigger],
     },
 
     {
@@ -788,8 +788,8 @@ sample_nodes = [
         "displayName": "Edit Image",
         "description": "Resize, crop, rotate, and convert images",
         "version": 1,
-        "inputs": [NodeConnectionTypes.Binary],
-        "outputs": [NodeConnectionTypes.Binary],
+        "inputs": [NodeConnectionTypes.Main],
+        "outputs": [NodeConnectionTypes.Action],
     },
 
     # ─────────────────────────────
@@ -802,7 +802,7 @@ sample_nodes = [
         "description": "Generate videos using Sora, Veo, Runway, Pika",
         "version": 1,
         "inputs": [NodeConnectionTypes.Main],
-        "outputs": [NodeConnectionTypes.Binary],
+        "outputs": [NodeConnectionTypes.Trigger],
     },
 
     {
@@ -824,7 +824,7 @@ sample_nodes = [
         "description": "Text-to-speech, voice synthesis, narration",
         "version": 1,
         "inputs": [NodeConnectionTypes.Main],
-        "outputs": [NodeConnectionTypes.Binary],
+        "outputs": [NodeConnectionTypes.Trigger],
     },
 
     {
@@ -833,7 +833,7 @@ sample_nodes = [
         "description": "Natural-sounding AI voice generation (TTS, voice cloning)",
         "version": 1,
         "inputs": [NodeConnectionTypes.Main],
-        "outputs": [NodeConnectionTypes.Binary],
+        "outputs": [NodeConnectionTypes.Trigger],
     },
 
     # ─────────────────────────────
@@ -858,7 +858,7 @@ sample_nodes = [
         "displayName": "Facebook Graph API",
         "description": "Upload videos and images to Facebook and Instagram",
         "version": 1,
-        "inputs": [NodeConnectionTypes.Binary],
+        "inputs": [NodeConnectionTypes.Trigger],
         "outputs": [NodeConnectionTypes.Main],
     },
       # ─────────────────────────────

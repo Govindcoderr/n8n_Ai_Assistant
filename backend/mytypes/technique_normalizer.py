@@ -180,45 +180,33 @@ KEYWORD_TECHNIQUE_MAP = {
     "knowledge graph": WorkflowTechnique.KNOWLEDGE_BASE,
     "customer relationship management": WorkflowTechnique.KNOWLEDGE_BASE,
 
+    # Chatbot
+    "chatbot": WorkflowTechnique.CHATBOT,
+    "conversational agent": WorkflowTechnique.CHATBOT,
+    "virtual assistant": WorkflowTechnique.CHATBOT,
+    "conversational AI": WorkflowTechnique.CHATBOT,
+    "rag": WorkflowTechnique.CHATBOT,
+    "retrieval augmented generation": WorkflowTechnique.CHATBOT,
+    "retrieval-augmented generation": WorkflowTechnique.CHATBOT,
+    "retrieval based": WorkflowTechnique.CHATBOT,
+    "retrieval-based": WorkflowTechnique.CHATBOT,
+    "conversational bot": WorkflowTechnique.CHATBOT,
+    "ai assistant": WorkflowTechnique.CHATBOT,
+    "ai chatbot": WorkflowTechnique.CHATBOT,
+    "chat bot": WorkflowTechnique.CHATBOT,
+    "chat ai": WorkflowTechnique.CHATBOT,
+    "conversational bot": WorkflowTechnique.CHATBOT,
+    "virtual bot": WorkflowTechnique.CHATBOT,
+    "virtual ai": WorkflowTechnique.CHATBOT,
+    "virtual assistant": WorkflowTechnique.CHATBOT,
+
+    # Automation
+    "automation": WorkflowTechnique.TRIAGE,
+    "automated": WorkflowTechnique.TRIAGE,
+    "auto": WorkflowTechnique.TRIAGE,
+
     
 }
-# ....... 
-
-# from backend.n8n_worflow.node_connection_types import NodeConnectionTypes
-# from backend.mytypes.categorization import WorkflowTechnique
-# from backend.n8n_worflow.node_connection_types import NodeConnectionTypes
-
-# TECHNIQUE_TO_CONNECTION_MAP = {
-#     WorkflowTechnique.CONTENT_GENERATION: NodeConnectionTypes.AiLanguageModel,
-#     WorkflowTechnique.NOTIFICATION: NodeConnectionTypes.AiTool,
-#     WorkflowTechnique.SCHEDULING: NodeConnectionTypes.Main,
-#     WorkflowTechnique.SCRAPING_AND_RESEARCH: NodeConnectionTypes.Main,
-#     WorkflowTechnique.KNOWLEDGE_BASE: NodeConnectionTypes.AiVectorStore,
-#     WorkflowTechnique.KNOWLEDGE_BASE: NodeConnectionTypes.AiDocument,
-#     WorkflowTechnique.CHATBOT: NodeConnectionTypes.AiLanguageModel,
-# }
-
-# #...
-
-# def normalize_techniques(raw_techniques: List[str]) -> List[WorkflowTechnique]:
-#     normalized = set()
-
-#     for raw in raw_techniques:
-#         raw_lower = raw.lower()
-
-#         # 1️ Direct enum name match (IMPORTANT)
-#         for technique in WorkflowTechnique:
-#             if raw_lower == technique.value:
-#                 normalized.add(technique)
-#                 break
-#         else:
-#             # 2️ Keyword-based fallback
-#             for keyword, enum_value in KEYWORD_TECHNIQUE_MAP.items():
-#                 if keyword in raw_lower:
-#                     normalized.add(enum_value)
-
-#     return list(normalized)
-
 
 def normalize_techniques(raw_techniques: List[str]) -> List[WorkflowTechnique]:
     normalized: set[WorkflowTechnique] = set()

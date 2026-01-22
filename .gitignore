@@ -10,3 +10,6 @@ __pycache__/
 .venv
 .env/
 .venv/
+# VSCode settings
+.vscode/
+.lunch.json

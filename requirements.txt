@@ -10,3 +10,4 @@ langchain-groq==0.1.4
 streamlit==1.37.1
 requests==2.32.3
 groq
+langgraph==0.0.48  

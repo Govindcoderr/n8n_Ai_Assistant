@@ -7,7 +7,7 @@ TECHNIQUE_TO_CONNECTION_MAP: dict[WorkflowTechnique, list[str]] = {
         NodeConnectionTypes.AiLanguageModel
     ],
     WorkflowTechnique.NOTIFICATION: [
-        NodeConnectionTypes.AiTool
+        NodeConnectionTypes.Action
     ],
     WorkflowTechnique.SCHEDULING: [
         NodeConnectionTypes.Trigger,

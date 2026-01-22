@@ -1,0 +1,65 @@
+{
+        "triggerType": "Trigger",
+        "name": "Manual -> HTTP Request -> Mailchimp",
+        "version": 1,
+        "workflowId": "f809adc9-4f79-4890-9195-b5468cff487b",
+        "description": "Workflow execution",
+        "nodes": [
+            {
+                "node_key": "88bbbfd5-d961-483d-8dfe-8e80eff82bac",
+                "nodeId": "88bbbfd5-d961-483d-8dfe-8e80eff82bac",
+                "type": "trigger",
+                "value": "MANUAL",
+                "parameters": {}
+            },
+            {
+                "node_key": "85a8d8ce-5d43-47af-a60a-60b1b6b8e9e0",
+                "nodeId": "85a8d8ce-5d43-47af-a60a-60b1b6b8e9e0",
+                "type": "action",
+                "value": "MAILCHIMP",
+                "parameters": {
+                    "options": {
+                        "enabled": []
+                    },
+                    "updateFields": {
+                        "enabled": []
+                    },
+                    "authentication": "apiKey",
+                    "resource": "campaign",
+                    "operation": "getAll",
+                    "list": "",
+                    "email": "",
+                    "status": "",
+                    "jsonParameters": false,
+                    "locationFieldsUi": {},
+                    "mergeFieldsUi": {},
+                    "mergeFieldsJson": "{}",
+                    "locationJson": "{}",
+                    "groupsUi": {},
+                    "groupJson": "{}",
+                    "returnAll": true,
+                    "limit": 500,
+                    "tags": [],
+                    "groupCategory": "",
+                    "campaignId": ""
+                }
+            },
+            {
+                "node_key": "1533ac43-a4b4-4efd-976d-503fe2cbd51b",
+                "nodeId": "1533ac43-a4b4-4efd-976d-503fe2cbd51b",
+                "type": "action",
+                "value": "HTTPREQUEST",
+                "parameters": {}
+            }
+        ],
+        "edges": [
+            {
+                "from_node": "88bbbfd5-d961-483d-8dfe-8e80eff82bac",
+                "to_node": "85a8d8ce-5d43-47af-a60a-60b1b6b8e9e0"
+            },
+            {
+                "from_node": "85a8d8ce-5d43-47af-a60a-60b1b6b8e9e0",
+                "to_node": "1533ac43-a4b4-4efd-976d-503fe2cbd51b"
+            }
+        ]
+    }
