@@ -1,5 +1,6 @@
+from typing import Any
 from pydantic import BaseModel, Field
-from typing import Dict, Any
+from typing_extensions import TypedDict
 
 from backend.Chains.prompt_categorization import prompt_categorization_chain
 from backend.error import ValidationError, ToolExecutionError
@@ -35,7 +36,7 @@ def build_categorization_message(categorization) -> str:
 
 
 def create_categorize_prompt_tool(llm):
-    def tool(input_data: Dict[str, Any]):
+    def tool(input_data: dict[str, Any]):
         reporter = createProgressReporter(
             CATEGORIZE_PROMPT_TOOL["tool_name"],
             CATEGORIZE_PROMPT_TOOL["display_title"],

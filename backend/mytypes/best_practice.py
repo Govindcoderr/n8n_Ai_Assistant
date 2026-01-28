@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Protocol
+# from typing import Protocol
 
 from .categorization import WorkflowTechniqueType
 
